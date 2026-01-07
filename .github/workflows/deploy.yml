@@ -29,7 +29,7 @@ jobs:
       - name: Deploy to IIS
         run: |
           & "C:\Program Files\IIS\Microsoft Web Deploy V3\msdeploy.exe" `
-          -verb:sync `
-          -source:contentPath="publish" `
-          -dest:contentPath=${{ secrets.SITE_NAME }},computerName=${{ secrets.PUBLISH_URL }},userName=${{ secrets.PUBLISH_USERNAME }},password=${{ secrets.PUBLISH_PASSWORD }},authType=Basic `
-          -allowUntrusted
+            -verb:sync `
+            -source:contentPath="${{ github.workspace }}\publish" `
+            -dest:contentPath=${{ secrets.SITE_NAME }},computerName=${{ secrets.PUBLISH_URL }},userName=${{ secrets.PUBLISH_USERNAME }},password=${{ secrets.PUBLISH_PASSWORD }},authType=Basic `
+            -allowUntrusted
