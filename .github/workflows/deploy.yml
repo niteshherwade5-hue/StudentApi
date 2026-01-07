@@ -2,34 +2,34 @@ name: Deploy to IIS
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
 
 jobs:
   build-and-deploy:
     runs-on: windows-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v3
-      with:
-        dotnet-version: '8.0.x'
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: "8.0.x"
 
-    - name: Restore dependencies
-      run: dotnet restore
+      - name: Restore dependencies
+        run: dotnet restore "WebApplication1.csproj"
 
-    - name: Build
-      run: dotnet build --configuration Release
+      - name: Build
+        run: dotnet build "WebApplication1.csproj" --configuration Release --no-restore
 
-    - name: Publish
-      run: dotnet publish -c Release -o publish
+      - name: Publish
+        run: dotnet publish "WebApplication1.csproj" -c Release -o publish --no-build
 
-    - name: Deploy to IIS
-      run: |
-        "C:\Program Files\IIS\Microsoft Web Deploy V3\msdeploy.exe" ^
-        -verb:sync ^
-        -source:contentPath="publish" ^
-        -dest:contentPath="${{ secrets.SITE_NAME }}",computerName="${{ secrets.PUBLISH_URL }}",userName="${{ secrets.PUBLISH_USERNAME }}",password="${{ secrets.PUBLISH_PASSWORD }}",authType="Basic" ^
-        -allowUntrusted
+      - name: Deploy to IIS
+        run: |
+          "C:\Program Files\IIS\Microsoft Web Deploy V3\msdeploy.exe" ^
+          -verb:sync ^
+          -source:contentPath="publish" ^
+          -dest:contentPath="${{ secrets.SITE_NAME }}",computerName="${{ secrets.PUBLISH_URL }}",userName="${{ secrets.PUBLISH_USERNAME }}",password="${{ secrets.PUBLISH_PASSWORD }}",authType="Basic" ^
+          -allowUntrusted
