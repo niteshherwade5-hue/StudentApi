@@ -6,7 +6,7 @@ on:
 
 jobs:
   build-and-deploy:
-    runs-on: windows-latest
+    runs-on: self-hosted
 
     steps:
       - name: Checkout code
@@ -27,9 +27,24 @@ jobs:
         run: dotnet publish "WebApplication1.csproj" -c Release -o publish --no-build
 
       - name: Deploy to IIS
+        shell: pwsh
         run: |
-          & "C:\Program Files\IIS\Microsoft Web Deploy V3\msdeploy.exe" `
-            -verb:sync `
-            -source:contentPath="${{ github.workspace }}\publish" `
-            -dest:contentPath=${{ secrets.SITE_NAME }},computerName=${{ secrets.PUBLISH_URL }},userName=${{ secrets.PUBLISH_USERNAME }},password=${{ secrets.PUBLISH_PASSWORD }},authType=Basic `
-            -allowUntrusted
+          $source = "$(Get-Location)\publish"
+          $destination = "C:\inetpub\wwwroot\StudentApi"
+          $appPool = "StudentApiAppPool"  # change to your actual app pool name
+
+          Write-Host "Cleaning IIS folder..."
+          if (Test-Path $destination) {
+              Get-ChildItem -Path $destination -Recurse -Force | Remove-Item -Force -Recurse
+          } else {
+              New-Item -ItemType Directory -Path $destination | Out-Null
+          }
+
+          Write-Host "Copying published files..."
+          Copy-Item -Path "$source\*" -Destination $destination -Recurse
+
+          Write-Host "Restarting IIS app pool..."
+          Import-Module WebAdministration
+          Restart-WebAppPool -Name $appPool
+
+          Write-Host "Deployment complete!"
