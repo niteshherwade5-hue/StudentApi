@@ -13,20 +13,23 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Restore dependencies
+        shell: powershell
         run: dotnet restore "WebApplication1.csproj"
 
       - name: Build
+        shell: powershell
         run: dotnet build "WebApplication1.csproj" --configuration Release --no-restore
 
       - name: Publish
+        shell: powershell
         run: dotnet publish "WebApplication1.csproj" -c Release -o publish --no-build
 
       - name: Deploy to IIS
-        shell: pwsh
+        shell: powershell
         run: |
           $source = "$(Get-Location)\publish"
           $destination = "C:\inetpub\wwwroot\StudentApi"
-          $appPool = "StudentApiAppPool"  # change to your actual app pool name
+          $appPool = "StudentApiAppPool"
 
           Write-Host "Cleaning IIS folder..."
           if (Test-Path $destination) {
