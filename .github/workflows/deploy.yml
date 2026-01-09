@@ -20,14 +20,14 @@ jobs:
         shell: powershell
         run: dotnet build "WebApplication1.csproj" --configuration Release --no-restore
 
-      - name: Publish
+      - name: Publish to external folder
         shell: powershell
-        run: dotnet publish "WebApplication1.csproj" -c Release -o publish --no-build
+        run: dotnet publish "WebApplication1.csproj" -c Release -o "C:\webapi\StudentApiPublish" --no-build
 
       - name: Deploy to IIS
         shell: powershell
         run: |
-          $source = "$(Get-Location)\publish"
+          $source = "C:\webapi\StudentApiPublish"
           $destination = "C:\inetpub\wwwroot\StudentApi"
           $appPool = "StudentApiAppPool"
 

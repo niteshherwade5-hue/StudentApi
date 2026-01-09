@@ -4,6 +4,7 @@ namespace WebApplication1.DTOs
     {
         public string Username { get; set; } = default!;//UserNmae
         public string Password { get; set; } = default!; //Pass
-        public string Role { get; set; } = "User";  // default role
+        public string Role { get; set; } = "User";  // default role  trigger deployment
+
     }
 }
