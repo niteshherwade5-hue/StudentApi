@@ -17,8 +17,6 @@ using WebApplication1.Helpers;
 using System.Security.Cryptography;
 using WebApplication1.Endpoints;
 
-
-
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Configuration
@@ -88,8 +86,27 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddAuthorization();
 
-
 var app = builder.Build();
+
+// -------------------------
+// REQUIRED FOR PRODUCTION
+// -------------------------
+
+// Serve static files (Swagger UI needs this)
+app.UseStaticFiles();
+
+// Routing middleware
+app.UseRouting();
+
+// Swagger for production
+app.UseSwagger();
+app.UseSwaggerUI(c =>
+{
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "WebApplication1 API v1");
+    c.RoutePrefix = "swagger"; // Swagger at /swagger
+});
+
+// -------------------------
 
 using (var scope = app.Services.CreateScope())
 {
@@ -126,13 +143,7 @@ using (var scope = app.Services.CreateScope())
 
         context.SaveChanges();
     }
-
 }
-
-
-app.UseSwagger();
-app.UseSwaggerUI();
-
 
 app.UseHttpsRedirection();
 
@@ -141,13 +152,8 @@ app.UseMiddleware<ExceptionMiddleware>();
 app.UseAuthentication();
 app.UseAuthorization();
 
+// Map endpoints
 app.MapStudentEndpoints();
 app.MapUserEndpoints();
 
 app.Run();
-
-
-
-
-
-
